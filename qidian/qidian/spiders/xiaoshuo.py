@@ -57,9 +57,12 @@ class XiaoshuoSpider(scrapy.Spider):
     def parse_content(self,response):
         print(response.url)
         item = response.meta["data"]
-        #获取章节名字，章节的名字一定要在这个函数中获取，如果在上一个函数中获取，在创建章节文件时，就会覆盖原有文件
+        #获取章节名字，章节的名字一定要在这个函数中获取，如果在上一个函数中获取，在创建章节文件时，
+        #就会覆盖原有文件
+        #后来发现,有点小说章节的名字含有"/",这样在存储时会报错,因为系统会认为"/"之后是下一个文件夹,找不到路径
+        #所以要把章节名中含有"/"的换成别的符号
         chapter_name = response.xpath('//h3[@class="j_chapterName"]/text()').extract()[0]
-        item["chapter_name"] = chapter_name
+        item["chapter_name"] = chapter_name.replace("/","-")
 
         #获取章节内容，由于内容在多个p标签里，所以就先定义了一个空字符串变量content
         content = ""
